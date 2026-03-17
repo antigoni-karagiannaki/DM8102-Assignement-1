@@ -1,39 +1,46 @@
 import unittest
+
 from main import sampling_without_replacement
-import random
-
-from tools import binomial_check
+from measurement_tools import binomial_check
 seed_val = 10
-random.seed(seed_val)
-class TestGraphGenerator(unittest.TestCase):
 
-    def test_sampling_wo_replacement_smallstream(self,):
+class TestGraphGenerator(unittest.TestCase):
+    """
+    The following function wheter a small sized stream is validated by the algorithm reservoir sampling
+    """
+    def test_small_stream_size(self,):
         S = [(0,1),(0,2)] # G(2,2)
-        k = 1
-        Sprime = sampling_without_replacement(S,k,seed_val)
-        self.assertTrue(Sprime == [(0,1)] or Sprime == [(0,2)])
-    
-    def test_reservoir_statistical(self):
-        #n -nb of elements in the stream, k -capacity of the reservoir and iteration nb
+        k = 1 #reservoir capacity
+        sample = sampling_without_replacement(S,k,seed_val)
+        self.assertTrue(sample == [(0,1)] or sample == [(0,2)]) 
+        
+    def test_repeated_elements_in_reservoir(self,):
+        S = [(0,1),(0,3),(0,3)] # G(2,2)
+        k = 2
+        sample = sampling_without_replacement(S,k,seed_val)
+        self.assertFalse(sample == [(0,3),(0,3)],"Test if there's repeated elements in the reservoir") 
+
+
+    def test_reservoir_occurence_statistical(self):
+        # n : nb of elements in the stream, k : capacity of the reservoir and number of iterations which will run
         n, k, iterations = 10, 3, 20000
         
         chosen_index = 0
+        S = [(i, j) for i in range(n) for j in range(i + 1, n)] # Generates a list of edges without self loops and repetions
         
-        S = [ (i,j) for i in range(n) for j in range(n)] #(0,1) = (1,0) are different in python so not considered
         appearing_count = 0
+
         sample = []
-        
-        for _ in range(1):
-            sample = sampling_without_replacement(S, k,seed_val)
-            chosen_sample = sample[chosen_index]
-        
+       
+        sample = sampling_without_replacement(S, k,seed_val)
+        chosen_sample = sample[chosen_index]
+    
         for _ in range(iterations):
-            sample = sampling_without_replacement(S, k,seed_val)
+            sample = sampling_without_replacement(S, k,None) #counting appearences
             if chosen_sample in sample:
                 appearing_count+=1
-        binomial_check(appearing_count,n,k/n)
-        
-
+        self.assertTrue(binomial_check(appearing_count,iterations,k/len(S)),"Testing uniform occurency rate of the chosen element")
 
 if __name__ == '__main__':
+    
     unittest.main()

@@ -1,8 +1,6 @@
 
 import random 
 
-
-
 def sampling_without_replacement(S, k , seed ):
     
     if seed  != None:
@@ -26,7 +24,6 @@ def sampling_without_replacement(S, k , seed ):
 # ----------------------------------------------------
 # Function that used the sampling w/o replacement to 
 # generate a G(n,m) Graph & returns its adjacency list
-#
 # n - number of nodes
 # m - number of edges
 # seed - num to rerun exact experiment
