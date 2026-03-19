@@ -1,5 +1,7 @@
 
 import random 
+import numpy as np
+import matplotlib.pyplot as plt
 
 def sampling_without_replacement(S, k , seed ):
     
@@ -43,6 +45,27 @@ def generate_gnm_using_sampler(n, m, seed=None):
 
     return adj   
 
+# Function that plots the degree distribution of a G(n,m) graph.
+def degree_distribution(n, m, k=200):
+    degree_counts = {}
+
+    for _ in range(k):
+        G = generate_gnm_using_sampler(n, m)
+        degrees = [len(neighbors) for neighbors in G]
+
+        for d in degrees:
+            degree_counts[d] = degree_counts.get(d, 0) + 1
+
+    xs = sorted(degree_counts.keys())
+    ys = [degree_counts[x] for x in xs]
+
+    plt.figure()
+    plt.bar(xs, ys)
+    plt.xlabel("Degree")
+    plt.ylabel("Frequency")
+    plt.title(f"Degree distribution in G({n},{m})")
+    plt.show()
+
 
 def main(): 
     # Example universe S : list of grid nodes
@@ -50,6 +73,15 @@ def main():
     k = 5 
     result = sampling_without_replacement(S,k,10)
     print("Sampled nodes:",result)
+
+    n=100  # number of nodes
+    m=200  # number of edges
+    adj = generate_gnm_using_sampler(n, m, seed=42)
+    print("Adjacency list of G(n,m):")
+        
+    degree_distribution(n, m)
+
+
 
 if __name__ == "__main__":
     main()
